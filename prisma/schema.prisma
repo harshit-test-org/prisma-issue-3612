@@ -1,0 +1,36 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["connectOrCreate"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Server {
+  id             String           @id
+  name           String?
+  channelId      String?
+  ServerToSinner ServerToSinner[] @relation("ServerTo_ServerToSinner")
+}
+
+model Sinner {
+  id             String           @id
+  username       String
+  ServerToSinner ServerToSinner[] @relation("SinnerTo_ServerToSinner")
+}
+
+model ServerToSinner {
+  serverId       String
+  sinnerId       String
+  questionsAsked Int      @default(0)
+  absolvedAt     DateTime
+  Server         Server   @relation("ServerTo_ServerToSinner", fields: [serverId], references: [id])
+  Sinner         Sinner   @relation("SinnerTo_ServerToSinner", fields: [sinnerId], references: [id])
+
+  @@id([serverId, sinnerId])
+  @@index([sinnerId], name: "fk_sinner")
+  @@map("_ServerToSinner")
+}
+
